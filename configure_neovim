@@ -1,0 +1,11 @@
+apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip
+
+rm -r ./build
+make CMAKE_BUILD_TYPE=Release
+make install
+
+pip install --upgrade neovim
+pip2 install --upgrade neovim
+pip3 install --upgrade neovim
+gem install neovim
+apt-get install xclip
