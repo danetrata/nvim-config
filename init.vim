@@ -169,6 +169,8 @@ Plug 'neovim/python-client'
 
 Plug 'klen/python-mode', {'for' : 'python'}
 
+" Php
+Plug 'swekaj/php-foldexpr.vim'
 
 call plug#end()
 
