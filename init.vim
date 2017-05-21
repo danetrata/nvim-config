@@ -2,7 +2,9 @@
 " Author: Daniel Etrata
 " Description: 
 " We will only try to load filetype specific plugins accordingly.
-" To navigate the folds,  {up:'zk', down:'zj', open all one fold level:'zr', close all one fold level:'zm', open one one fold level:'za'}
+" To navigate the folds,  {up:'zk', down:'zj',
+" open all one fold level:'zr', close all one fold level:'zm',
+" toggle fold level:'za'}
 " Last Modified: December 20, 2016
 " General Guidelines:
 " We will try to follow this format for settings.
@@ -22,6 +24,13 @@
 let g:vim_directory = '~/.config/nvim'
 set nocompatible                       " resets several options to their defaults
 autocmd!
+
+
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+    silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall | nested source $MYVIMRC 
+endif
 
 
 "}}}
@@ -61,18 +70,6 @@ endfunction
 
 "{{{ Deoplete
 let g:deoplete#enable_at_startup = 1
-"}}}
-
-"{{{ UltiSnips
-" make YCM compatible with UltiSnips (using supertab)
-" let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-" let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-let g:SuperTabDefaultCompletionType = '<C-n>'
- 
-" better key bindings for UltiSnipsExpandTrigger
-let g:UltiSnipsExpandTrigger="<cr>"
-let g:UltiSnipsJumpForwardTrigger="<c-j>"
-let g:UltiSnipsJumpBackwardTrigger="<c-k>"
 "}}}
 
 "{{{ Pymode
@@ -115,21 +112,27 @@ endfunction
 
 "{{{ Deoplete + Neosnippet
 " deoplete + neosnippet
+let g:AutoPairsMapCR=0 
 let g:deoplete#enable_at_startup = 1
+let g:neosnippet#enable_completed_snippet = 1
+let g:deoplete#auto_complete_start_length = 1 
 let g:deoplete#enable_smart_case = 1
-imap <expr><TAB> pumvisible() ? "\<C-n>" : neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-imap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<S-TAB>"
-inoremap <expr><CR> pumvisible() ? deoplete#mappings#close_popup() : "\<CR>"
+let g:neosnippet#snippets_directory = [ g:vim_directory."/bundle",
+            \g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
+            \g:vim_directory."/bundle/vim-snippets/snippets" ] 
+imap <expr><TAB> pumvisible() ? "\<C-n>" : (neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<c-t>") 
+imap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<c-d>"
+imap <expr><CR> pumvisible() ? deoplete#mappings#close_popup() : "\<CR>\<Plug>AutoPairsReturn"
 "}}}
 
 "}}}
 
 "{{{ Runtime
-call plug#begin(g:vim_directory.'/bundle')
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                  General                                   "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call plug#begin(g:vim_directory.'/bundle')
 
 
 " Personal plugins
@@ -158,7 +161,16 @@ Plug 'danetrata/vimwiki', { 'do': 'LoadVimWiki' , 'branch': 'dev' }
 " Asynchronous keyword completion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } | Plug 'davidhalter/jedi-vim'
 " Automated document generation
-Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets' | Plug 'ervandew/supertab'
+Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets'
+
+" Completions and snippets
+Plug 'jiangmiao/auto-pairs'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'zchee/deoplete-jedi', { 'for': 'python' }
+Plug 'Shougo/neco-vim', { 'for': 'vim' }
+Plug 'Shougo/neosnippet' | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
+Plug 'Shougo/context_filetype.vim'
+" Plug 'SirVer/ultisnips'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "                                   Python                                   "
@@ -166,7 +178,6 @@ Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets' | Plug 'ervande
 
 " Python client
 Plug 'neovim/python-client'
-
 Plug 'klen/python-mode', {'for' : 'python'}
 
 " Php
@@ -221,7 +232,7 @@ set splitright                         " Preference splitting to the right
 set splitbelow                         " Preference splitting below
 set autochdir                          " always change the current directory to match buffer
 set autoread                           " Refresh file if changed
-set hidden                             " allows switching between files without needing to save
+" set hidden                             " allows switching between files without needing to save
 set backspace=indent,eol,start         " allow backspace over these 
 set virtualedit=onemore                " allows cursor beyond last char
 set scrolljump=7                       " automatically scroll n when the cursor hits the edge
@@ -328,7 +339,29 @@ function! CheckMappings()
     :echo "\"m\""| map <c-m>
 endfunction
 "}}}
+
+" neovim terminal
+tnoremap <Esc> <C-\><C-n>
+" visor style terminal buffer
+let s:termbuf = 0
+function! ToggleTerm()
+    belowright 15 split
+    try
+        exe 'buffer' . s:termbuf
+        startinsert
+    catch
+        terminal
+        let s:termbuf=bufnr('%')
+        tnoremap <buffer> <A-t>  <C-\><C-n>:close<cr>
+    endtry
+endfunction
+
+com! ToggleTerm call ToggleTerm()
+nnoremap <A-t> :ToggleTerm<cr>
 "}}}
+
+
+"{{{ Unsorted
 
 "{{{ Benchmark vimrc
 nnoremap <silent> <leader>dd :exe ":profile start profile.log"<cr>:exe ":profile func *"<cr>:exe ":profile file *"<cr>
@@ -337,20 +370,19 @@ nnoremap <silent> <leader>dc :exe ":profile continue"<cr>
 nnoremap <silent> <leader>dq :exe ":profile pause"<cr>:noautocmd qall!<cr>
 "}}}
 
-" spaces and tabs {{{
-syntax on                              " allows vim to highlight language syntax based on filetype
-syntax sync minlines=256               " speed up syntax. The trade off is there might be some inaccuracies with highlighting
-set synmaxcol=250                      " fixes slow downs with really long lines
-set shiftwidth=4                       " indenting is 4 spaces
-set tabstop=4                          " number of visual spaces per TAB
-set expandtab                          " tabs are spaces
-set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ " highlights whitespace
+"  spaces and tabs {{{
+
+syntax on                                "  allows vim to highlight language syntax based on filetype
+syntax sync minlines=256                 "  speed up syntax. The trade off is there might be some inaccuracies with highlighting
+set synmaxcol=250                        "  fixes slow downs with really long lines
+set shiftwidth=4                         "  indenting is 4 spaces
+set tabstop=4                            "  number of visual spaces per TAB
+set expandtab                            "  tabs are spaces
+set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ "  highlights whitespace
 
 "tab
 " for command mode
 " for insert mode
-" inoremap <S-Tab> <C-d>
-" inoremap <Tab> <C-t>
 nmap <s-tab> <<
 nmap <tab> >>
 vmap <S-Tab> <
@@ -436,7 +468,7 @@ noremap <C-k> <C-w>k
 "}}}
 
 "{{{ Focus
-    set updatetime=500
+    set updatetime=1000
 
     autocmd CursorMoved * if LongEnough( "b:myTimer", 2, 5 ) | set number nocursorline norelativenumber colorcolumn= | endif
     autocmd CursorHold * :set cursorline relativenumber colorcolumn=80  "updatetime=2000
@@ -528,6 +560,9 @@ augroup commentleader
 
 augroup END
 "}}}
+" }}}
+
+" }}}
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -536,6 +571,9 @@ augroup END
 "{{{ python
 
 nmap == :set textwidth=72<CR>gqj:set textwidth=79<CR>
+" autocmd FileType python nnoremap <buffer> <localleader><F5> :exec '!python' shellescape(@%, 1)<cr>
+autocmd FileType python nnoremap <buffer> <localleader>2 :term python ./% <CR>
+autocmd FileType python nnoremap <buffer> <localleader>3 :term python3 ./% <CR>
 
 autocmd FileType python call LoadPymode()
 
@@ -635,7 +673,6 @@ augroup END
     autocmd FileType cpp map <localleader>f O//FINISHED
 "}}}
 
-" }}}
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
