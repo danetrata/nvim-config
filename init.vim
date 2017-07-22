@@ -190,7 +190,8 @@ Plug 'klen/python-mode', {'for' : 'python'}
 
 " Django
 Plug 'vim-scripts/django.vim'
-call plug#end()
+" Php
+Plug 'swekaj/php-foldexpr.vim'
 
 
 "}}}
