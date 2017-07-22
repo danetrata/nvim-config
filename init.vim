@@ -81,12 +81,13 @@ function! LoadPymode()
     " ignore import errors
     " let g:pymode_lint_ignore = "C0325, F0401"
     " use these error checkers
-    " let g:pymode_lint_checkers = ['mccabe', 'pep8', 'pyflakes', 'pylint']
+    let g:pymode_lint_checkers = ['mccabe', 'pep8', 'pyflakes', 'pylint']
     let g:pymode_lint_on_write = 0
     let g:pymode_lint_cwindow = 0
     let g:pymode_lint_sort = ['E']
     let g:pymode_rope_completion = 0
     let g:pymode_rope_autoimport=0
+    let g:pymode_rope = 0 
     let g:pymode_run_bind = '<f5>'
     " let g:pymode_syntax = 1
     " let g:pymode_syntax_all = 0
@@ -105,7 +106,7 @@ function! LoadPymode()
     " let g:pymode_syntax_doctests = 1
     " let g:pymode_syntax_docstrings = 1
     nmap <f7> :PymodeLint<cr>
-    nmap <leader><f7> :PymodeLintAuto<cr>
+    nmap <LocalLeader><f7> :PymodeLintAuto<cr>
     nmap <f8> :vert lopen<cr>
 endfunction
 "}}}
@@ -118,11 +119,18 @@ let g:neosnippet#enable_completed_snippet = 1
 let g:deoplete#auto_complete_start_length = 1 
 let g:deoplete#enable_smart_case = 1
 let g:neosnippet#snippets_directory = [ g:vim_directory."/bundle",
-            \g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
-            \g:vim_directory."/bundle/vim-snippets/snippets" ] 
-imap <expr><TAB> pumvisible() ? "\<C-n>" : (neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<c-t>") 
+            \ g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
+            \ g:vim_directory."/bundle/vim-snippets/snippets" ] 
+imap <expr><TAB> pumvisible() ?
+            \ "\<C-n>" : 
+                \ (neosnippet#expandable_or_jumpable() ?
+                \ "\<Plug>(neosnippet_expand_or_jump)" : "\<c-t>") 
 imap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<c-d>"
-imap <expr><CR> pumvisible() ? deoplete#mappings#close_popup() : "\<CR>\<Plug>AutoPairsReturn"
+imap <expr><CR> pumvisible() ? 
+            \ deoplete#close_popup() : 
+                \ (neosnippet#expandable_or_jumpable() ?
+                \ "\<Plug>(neosnippet_expand_or_jump)" : "\<CR>\<Plug>AutoPairsReturn")
+" imap <expr><CR> pumvisible() ? "<CR>" : "\<CR>\<Plug>AutoPairsReturn"
 "}}}
 
 "}}}
@@ -180,7 +188,8 @@ Plug 'Shougo/context_filetype.vim'
 Plug 'neovim/python-client'
 Plug 'klen/python-mode', {'for' : 'python'}
 
-
+" Django
+Plug 'vim-scripts/django.vim'
 call plug#end()
 
 
@@ -339,7 +348,13 @@ endfunction
 "}}}
 
 " neovim terminal
-tnoremap <Esc> <C-\><C-n>
+nnoremap <A-t> :ToggleTerm<cr>
+tnoremap <Esc><Esc> <C-\><C-n>
+tnoremap <leader>h <C-\><C-n><C-w>h
+tnoremap <leader>j <C-\><C-n><C-w>j
+tnoremap <leader>k <C-\><C-n><C-w>k
+tnoremap <leader>l <C-\><C-n><C-w>l
+autocmd WinEnter term://* startinsert
 " visor style terminal buffer
 let s:termbuf = 0
 function! ToggleTerm()
@@ -355,7 +370,6 @@ function! ToggleTerm()
 endfunction
 
 com! ToggleTerm call ToggleTerm()
-nnoremap <A-t> :ToggleTerm<cr>
 "}}}
 
 
@@ -570,8 +584,8 @@ augroup END
 
 nmap == :set textwidth=72<CR>gqj:set textwidth=79<CR>
 " autocmd FileType python nnoremap <buffer> <localleader><F5> :exec '!python' shellescape(@%, 1)<cr>
-autocmd FileType python nnoremap <buffer> <localleader>2 :term python ./% <CR>
-autocmd FileType python nnoremap <buffer> <localleader>3 :term python3 ./% <CR>
+autocmd FileType python nnoremap <buffer> <localleader>2 :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term python <c-r>=escape(g:current_file_name,'\/') <CR><cr>
+autocmd FileType python nnoremap <buffer> <localleader>3 :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term python3 <c-r>=escape(g:current_file_name,'\/') <CR><cr>
 
 autocmd FileType python call LoadPymode()
 
@@ -594,6 +608,7 @@ autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#59
 autocmd FileType python match OverLength /\%<73v.\%>72v/
 autocmd FileType python map <localleader>n O# Note:<cr>"""<cr>"""<esc>O
 autocmd FileType python map <localleader>t O# TODO:<cr>"""<cr>"""<esc>O
+autocmd BufRead,BufNewFile *.html set filetype=htmldjango
 "}}}
 
 "{{{ reStructured Text
