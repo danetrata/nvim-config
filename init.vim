@@ -193,6 +193,8 @@ Plug 'vim-scripts/django.vim'
 " Php
 Plug 'swekaj/php-foldexpr.vim'
 
+call plug#end()
+
 
 "}}}
 
