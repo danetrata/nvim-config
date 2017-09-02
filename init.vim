@@ -105,9 +105,8 @@ function! LoadPymode()
     " let g:pymode_syntax_highlight_exceptions = 0
     " let g:pymode_syntax_doctests = 1
     " let g:pymode_syntax_docstrings = 1
-    nmap <f7> :PymodeLint<cr>
-    nmap <LocalLeader><f7> :PymodeLintAuto<cr>
-    nmap <f8> :vert lopen<cr>
+    nmap <localleader><l> :PymodeLint<cr>:vert lopen<cr>
+    nmap <LocalLeader><L> :PymodeLintAuto<cr>
 endfunction
 "}}}
 
@@ -170,6 +169,8 @@ Plug 'danetrata/vimwiki', { 'do': 'LoadVimWiki' , 'branch': 'dev' }
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } | Plug 'davidhalter/jedi-vim'
 " Automated document generation
 Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets'
+" Large files
+Plug 'vim-scripts/LargeFile'
 
 " Completions and snippets
 Plug 'jiangmiao/auto-pairs'
@@ -186,7 +187,7 @@ Plug 'Shougo/context_filetype.vim'
 
 " Python client
 Plug 'neovim/python-client'
-Plug 'klen/python-mode', {'for' : 'python'}
+Plug 'python-mode/python-mode', {'for' : 'python', 'branch' : 'master'}
 
 " Django
 Plug 'vim-scripts/django.vim'
@@ -221,7 +222,7 @@ set title                              " rename terminal
 "             \\ %{SyntasticStatuslineFlag()} " detailed command bar
 set history=200                        " a longer command history
 set wildmenu                           " visual autocomplete for command menu
-set lines=30 columns=85
+" set lines=30 columns=85
 " color {{{
 if has("gui_running")
     colorscheme badwolf
@@ -268,6 +269,8 @@ nmap <leader>y "+y
 " move between tabs
 nmap <f4> :tabn<cr>
 nmap <s-f4> :tabp<cr>
+nmap `n :tabn<cr>
+nmap `N :tabp<cr>
 " replace the current word with yank
 nmap <leader>cc viwc<C-R>0<esc>
 nmap <c-o> o<esc>
@@ -379,7 +382,7 @@ com! ToggleTerm call ToggleTerm()
 "{{{ Unsorted
 
 "{{{ Benchmark vimrc
-nnoremap <silent> <leader>dd :exe ":profile start profile.log"<cr>:exe ":profile func *"<cr>:exe ":profile file *"<cr>
+nnoremap <silent> <leader>dd :exe ":profile start /home/detrata/profile.log"<cr>:exe ":profile func *"<cr>:exe ":profile file *"<cr>
 nnoremap <silent> <leader>dp :exe ":profile pause"<cr>
 nnoremap <silent> <leader>dc :exe ":profile continue"<cr>
 nnoremap <silent> <leader>dq :exe ":profile pause"<cr>:noautocmd qall!<cr>
@@ -444,8 +447,8 @@ onoremap <c-LeftDrag> <C-C><LeftDrag>
 
 " movement {{{
 " move vertically by visual line
-noremap j gj
-noremap k gk
+" noremap j gj
+" noremap k gk
 " move by line when given a movement
 onoremap j j
 onoremap k k
@@ -472,6 +475,15 @@ noremap <C-l> <C-w>l
 noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
+noremap gl <C-w>l
+" gh overwrites select mode - this is fine
+noremap gh <C-w>h
+noremap gj <C-w>j
+noremap gk <C-w>k
+noremap `l <C-w>l
+noremap `h <C-w>h
+noremap `j <C-w>j
+noremap `k <C-w>k
 " }}}
 
 "{{{ Close completion help
@@ -485,7 +497,7 @@ noremap <C-k> <C-w>k
 "{{{ Focus
     set updatetime=1000
 
-    autocmd CursorMoved * if LongEnough( "b:myTimer", 2, 5 ) | set number nocursorline norelativenumber colorcolumn= | endif
+    autocmd CursorMoved * if LongEnough( "b:myTimer", 30, 5 ) | set number nocursorline norelativenumber colorcolumn= | endif
     autocmd CursorHold * :set cursorline relativenumber colorcolumn=80  "updatetime=2000
 " Returns true if at least delay seconds have elapsed since the last time this function was called, based on the time
 " contained in the variable "timer". The first time it is called, the variable is defined and the function returns
@@ -560,6 +572,8 @@ augroup commentleader
     autocmd FileType python              let b:comment_leader = '# '
 
 
+    " "<C-R>" pastes the register while "=escape()" assigns the register a
+    " value
     noremap <silent> <localleader>c
                 \ :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')
                 \ <CR>/<CR>:nohlsearch<CR>
@@ -567,9 +581,7 @@ augroup commentleader
                 \ :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')
                 \ <CR>//e<CR>:nohlsearch<CR>
 
-    " Aligns comments
-    " "<C-R>" pastes the register while "=escape()" assigns the register a
-    " value
+    " Aligns comments based on comment leader
     noremap <silent> <localleader><Tab> 
                 \ :Tab /<C-R>=escape(b:comment_leader,'\/')<CR><CR>
 
@@ -607,8 +619,8 @@ autocmd FileType python noremap <silent> <localleader><
             \ <CR>//e<CR>:nohlsearch<CR>
 
 " highlight character at 72
-autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-autocmd FileType python match OverLength /\%<73v.\%>72v/
+" autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+" autocmd FileType python match OverLength /\%<73v.\%>72v/
 autocmd FileType python map <localleader>n O# Note:<cr>"""<cr>"""<esc>O
 autocmd FileType python map <localleader>t O# TODO:<cr>"""<cr>"""<esc>O
 autocmd BufRead,BufNewFile *.html set filetype=htmldjango
@@ -713,6 +725,7 @@ if ( !exists( "*SourceVimrc" ) )
     function SourceVimrc()
         execute 'source '.g:vim_directory.'/init.vim'
         echom "new vimrc loaded!"
+        execute 'syntax sync fromstart' 
     endfunction
 endif
 "}}}
