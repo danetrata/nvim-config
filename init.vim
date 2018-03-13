@@ -1,7 +1,7 @@
 " File: init.vim
 
 " Author: Daniel Etrata
-" Description: 
+" Description:
 " We will only try to load filetype specific plugins accordingly.
 " To navigate the folds,  {up:'zk', down:'zj',
 " open all one fold level:'zr', close all one fold level:'zm',
@@ -9,11 +9,12 @@
 " insert a fold:',zf'
 " Last Modified: December 20, 2016
 " General Guidelines:
-" We will try to follow this format for settings.
-" [autocmd/let]
+" We will try to follow this organization for sections.
+" [let]
 " [set]
-" [map]
-" [function] - fold if possible
+" [mappings]
+" [functions] - fold if possible
+" [autocmd] - fold if possible
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -25,13 +26,14 @@
 " directory
 let g:vim_directory = '~/.config/nvim'
 set nocompatible                       " resets several options to their defaults
+set hidden
 autocmd!
 
 
 if empty(glob('~/.config/nvim/autoload/plug.vim'))
     silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
         \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall | nested source $MYVIMRC 
+    autocmd VimEnter * PlugInstall | nested source $MYVIMRC
 endif
 
 
@@ -45,10 +47,11 @@ endif
 " overwrite theme colorcolumn. we use this in highlighting characters at col 81
 autocmd VimEnter * highlight ColorColumn ctermbg=magenta
 autocmd BufEnter * highlight ColorColumn ctermbg=magenta
+
 "{{{ Plugin settings
 
 "{{{ Personal
-"{{{ Number Toggle 
+"{{{ Number Toggle
 nnoremap <silent><leader>c :SCROLLCOLOR<cr>
 nnoremap <leader>n :call NumberToggle()<cr>
 "}}}
@@ -77,7 +80,7 @@ command! LoadVimWiki :call LoadVimWiki({'none': 'none'})
 
 "{{{ Deoplete
 " let g:deoplete#enable_at_startup = 1
-let g:deoplete#auto_complete_delay = 1000
+let g:deoplete#auto_complete_delay = 500
 "}}}
 
 "{{{ Pymode
@@ -93,6 +96,7 @@ let g:pymode_lint_ignore = 'E501, C0301, C0411'
 " use these error checkers
 let g:pymode_lint_checkers = ['mccabe', 'pep8', 'pyflakes', 'pylint']
 let g:pymode_rope_rename_bind = '<leader>r'
+let g:pymode_run_bind = ''
 let g:pymode_lint_on_write = 0
 let g:pymode_lint_cwindow = 0
 let g:pymode_lint_sort = ['E']
@@ -118,31 +122,83 @@ let g:pymode_doc = 0
 " let g:pymode_syntax_highlight_exceptions = 0
 " let g:pymode_syntax_doctests = 1
 " let g:pymode_syntax_docstrings = 1
+
+
+python3 << EOF
+import vim
+import git
+def is_git_repo():
+    try:
+        _ = git.Repo('.', search_parent_directories=True).git_dir
+        return "1"
+    except:
+        return "0"
+vim.command("let g:pymode_rope = " + is_git_repo())
+EOF
+
 function! LoadPymode(info)
-    nnoremap <localleader>l :PymodeLint<cr>:vert lopen<cr>
+    nnoremap <localleader>l :PymodeLint<cr>:vert lopen<cr><cr>
     nnoremap <LocalLeader>L :PymodeLintAuto<cr>
 endfunction
 command! LoadPymode :call LoadPymode({'none': 'none'})
+
+" let b:location_open = 0
+" function! LocationToggle()
+"     if(b:location_open==1) " currently enabled, set to disabled
+"         echom "Closing Python code checkers"
+"         PymodeLintToggle
+"         lclose
+"         let b:location_open=0
+"     else " currently disabled, set to enable
+"         echom "Starting Python code checkers"
+"         PymodeLintToggle
+"         lopen
+"         normal <cr>
+"         let b:location_open=1
+"     endif
+" endfunc
+" command! LocationToggle :call LocationToggle()
+" FIXME: Fix toggle behavior. An example below.
+" nnoremap <leader>q :call QuickfixToggle()<cr>
+" 
+" let g:quickfix_is_open = 0
+" 
+" function! QuickfixToggle()
+"     if g:quickfix_is_open
+"         cclose
+"         let g:quickfix_is_open = 0
+"         execute g:quickfix_return_to_window . "wincmd w"
+"     else
+"         let g:quickfix_return_to_window = winnr()
+"         copen
+"         let g:quickfix_is_open = 1
+"     endif
+" endfunction
+
 "}}}
 
 "{{{ jedi
-let g:jedi#use_splits_not_buffers = 'bottom'
+" let g:jedi#use_splits_not_buffers = 'bottom'
 let g:jedi#popup_on_dot = 0
 let g:jedi#smart_auto_mappings = 0
 let g:jedi#show_call_signatures = 0
+
+let g:jedi#rename_visual = ''
+let g:jedi#rename = ''
+let g:jedi#usages_command = '<leader>gu'
 "}}}
 
 "{{{ Deoplete + Neosnippet
 " deoplete + neosnippet
-" let g:AutoPairsMapCR=0 
+" let g:AutoPairsMapCR=0
 let g:AutoClosePreserveEnterMapping = 1
 let g:deoplete#enable_at_startup = 1
-let g:neosnippet#enable_completed_snippet = 1
-let g:deoplete#auto_complete_start_length = 1 
+let g:echo = 1
+let g:deoplete#auto_complete_start_length = 1
 let g:deoplete#enable_smart_case = 1
 let g:neosnippet#snippets_directory = [ g:vim_directory."/bundle",
             \ g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
-            \ g:vim_directory."/bundle/vim-snippets/snippets" ] 
+            \ g:vim_directory."/bundle/vim-snippets/snippets" ]
 imap <expr><TAB> pumvisible() ?
             \ "\<C-n>" : 
                 \ (neosnippet#expandable_or_jumpable() ?
@@ -177,6 +233,8 @@ let NERDTreeMapOpenInTab='<ENTER>'
 "{{{ airline config
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#tab_nr_type = 2 " splits and tab number
+let g:airline#extensions#bufferline#enabled = 0
+let g:airline#extensions#tabline#show_buffers = 0
 
 " let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap g1 <Plug>AirlineSelectTab1
@@ -194,10 +252,10 @@ nmap g9 <Plug>AirlineSelectTab9
 let g:tmux_navigator_disable_when_zoomed = 1
 let g:tmux_navigator_no_mappings = 1
 
-nnoremap <silent> `h :TmuxNavigateLeft<cr>
-nnoremap <silent> `j :TmuxNavigateDown<cr>
-nnoremap <silent> `k :TmuxNavigateUp<cr>
-nnoremap <silent> `l :TmuxNavigateRight<cr>
+" nnoremap <silent> `h :TmuxNavigateLeft<cr>
+" nnoremap <silent> `j :TmuxNavigateDown<cr>
+" nnoremap <silent> `k :TmuxNavigateUp<cr>
+" nnoremap <silent> `l :TmuxNavigateRight<cr>
 " nnoremap <silent> {Previous-Mapping} :TmuxNavigatePrevious<cr>
 "}}}
 
@@ -212,11 +270,82 @@ nnoremap <silent> `l :TmuxNavigateRight<cr>
 "{{{ CommandT
 " let g:CommandTAcceptSelectionMap = '<c-o>'
 " let g:CommandTAcceptSelectionTabMap = '<cr>'
-nmap <silent> <Leader>gt <Plug>(CommandT)
-nmap <silent> <Leader>gb <Plug>(CommandTBuffer)
-nmap <silent> <Leader>gj <Plug>(CommandTJump)
+nnoremap <silent> <Leader>gt <Plug>(CommandT)
+nnoremap <silent> <Leader>gb <Plug>(CommandTBuffer)
+nnoremap <silent> <Leader>gj <Plug>(CommandTJump)
 "}}}
 
+"{{{ Ack
+" ack with insensitive literal search.
+" note the trailing whitespace
+nnoremap <leader>a :Ack! -iF 
+"}}}
+
+" {{{ pgsql
+let g:sql_type_default = 'pgsql'
+" }}}
+
+" {{{ pgsql
+" vnoremap <leader>sf        <Plug>SQLU_Formatter<CR>
+" }}}
+
+"{{{ Ultisnip
+" function! GetAllSnippets(info)
+"   call UltiSnips#SnippetsInCurrentScope(1)
+"   let list = []
+"   for [key, info] in items(g:current_ulti_dict_info)
+"     let parts = split(info.location, ':')
+"     call add(list, {
+"       \"key": key,
+"       \"path": parts[0],
+"       \"linenr": parts[1],
+"       \"description": info.description,
+"       \})
+"   endfor
+"   echo list
+" endfunction
+" command! GetSnippet :call GetAllSnippets({'none': 'none'})
+"}}}
+
+"{{{ Syntastic
+let g:syntastic_shell = "/bin/bash"
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 0
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 0
+let g:syntastic_mode_map = {
+    \ "mode": "active",
+    \ "active_filetypes": [],
+    \ "passive_filetypes": [] }
+"}}}
+
+"{{{ PyDocString
+nmap <silent> <localleader>d <Plug>(pydocstring)
+"}}}
+
+"{{{ easytags
+let g:easytasgs_async = 1
+"}}}
+
+"{{{ atags
+" autocmd BufWritePost * call atags#generate()
+"}}}
+
+"{{{ vim-autoformat
+let g:formatterpath = ['~/github/yapf/yapf']
+noremap <leader>f :Autoformat<cr>
+"}}}
+
+"{{{ splitjoin
+nmap sj :SplitjoinSplit<cr>
+nmap sk :SplitjoinJoin<cr> 
+"}}}
+
+"{{{
+let g:bufferline_echo = 1
+let g:bufferline_rotate = 2
+"}}}
 "}}}
 
 "{{{ Runtime
@@ -231,6 +360,10 @@ call plug#begin(g:vim_directory.'/bundle')
 Plug g:vim_directory.'/bundle/personal'
 " Better directory navigation
 Plug 'scrooloose/nerdtree'
+" Focused vim
+Plug 'merlinrebrovic/focus.vim'
+" Matching parenthesis
+Plug 'luochen1990/rainbow'
 " Tree navigation of 'undo'
 Plug 'sjl/gundo.vim'
 " Color scheme
@@ -240,6 +373,8 @@ Plug 'sjl/badwolf'
 Plug 'Yggdroot/indentLine'
 " Advanced status line
 Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
+" Bottom bar buffer line
+Plug 'bling/vim-bufferline'
 " Easy character alignment
 Plug 'godlygeek/tabular'
 " Quick posting to Gist
@@ -247,7 +382,8 @@ Plug 'mattn/gist-vim' | Plug 'mattn/webapi-vim'
 " Quickly add or change the surroundings
 Plug 'tpope/vim-surround'
 " Automatically close surroundings
-Plug 'somini/vim-autoclose'
+" Plug 'somini/vim-autoclose'
+Plug 'danetrata/vim-autoclose'
 " Plug 'jiangmiao/auto-pairs'
 " Landmark based movement
 Plug 'easymotion/vim-easymotion' | Plug 'tpope/vim-repeat'
@@ -266,40 +402,55 @@ Plug 'mhinz/vim-signify'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 " fuzzy file search
 Plug 'wincent/Command-T'
-" fuzzy line search
-" Plug 'sjbach/lusty'
 " grep in vim
-" Plug 'mileszs/ack.vim'
+Plug 'mileszs/ack.vim'
 " grep in vim
-Plug 'Numkil/ag.nvim'
+" Plug 'Numkil/ag.nvim'
 " explore buffers
- Plug 'jlanzarotta/bufexplorer'
-
+Plug 'jlanzarotta/bufexplorer'
+" Narrowed windows
+Plug 'chrisbra/NrrwRgn'
+" Fuzzy search, tab and buffer management, and so much more
+Plug 'vim-ctrlspace/vim-ctrlspace'
 
 " faster folding, better than pymode
 Plug 'Konfekt/FastFold'
+
+" Tag generation
+" Plug 'xolox/vim-easytags' | Plug 'xolox/vim-misc' | Plug 'xolox/vim-shell'
+" Tag generation
+" Plug 'fntlnz/atags.vim'
 " Tag overview
 Plug 'majutsushi/tagbar'
+" join or split long lines
+Plug 'AndrewRadev/splitjoin.vim'
+
 " Tmux aware panes
 Plug 'christoomey/vim-tmux-navigator'
 
-
 " Completions and snippets
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'zchee/deoplete-jedi', { 'for': 'python' }
 Plug 'Shougo/neco-vim', { 'for': 'vim' }
-Plug 'Shougo/neosnippet' | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
+" Plug 'Shougo/neosnippet' | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
 Plug 'Shougo/context_filetype.vim'
-" Plug 'SirVer/ultisnips'
+" Plug 'SirVer/ultisnips' | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
+Plug 'garbas/vim-snipmate' | Plug 'MarcWeber/vim-addon-mw-utils' | Plug 'tomtom/tlib_vim'  | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"                                   Python                                   "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Syntax checker
+Plug 'vim-syntastic/syntastic'
 
 " Python client
+" Completions and snippets
+Plug 'zchee/deoplete-jedi', { 'for': 'python' }
+" Neovim specific improvements
 Plug 'neovim/python-client', {'for' : 'python'}
+" Large library of python specific functions
 Plug 'python-mode/python-mode', {'for' : 'python', 'branch' : 'master'}
 autocmd! User python-mode LoadPymode
+" Autodoc generation
+Plug 'heavenshell/vim-pydocstring'
+" Formatter
+Plug 'Chiel92/vim-autoformat'
 
 " Specific python folding
 " Plug 'tmhedberg/SimpylFold'
@@ -310,6 +461,10 @@ Plug 'tweekmonster/django-plus.vim', {'for' : ['python', 'html']}
 
 " Php
 Plug 'swekaj/php-foldexpr.vim', {'for' : 'php'}
+
+" Postgresql
+Plug 'lifepillar/pgsql.vim'
+Plug 'vim-scripts/SQLUtilities'
 
 call plug#end()
 
@@ -358,6 +513,47 @@ autocmd FileType yaml,yml set tabstop=2 shiftwidth=2
 set expandtab                            "  tabs are spaces
 set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ "  highlights whitespace
 
+"{{{ remove trailing whitespace on save
+function! StripTrailingWhitespace()
+  if search('\s\+$') > 0
+    echom "Trailing whitespace found\n"
+    normal mZ
+    let l:chars = col("$")
+    %s/\s\+$//ec
+    if (line("'Z") != line(".")) || (l:chars != col("$"))
+        echom "Trailing whitespace stripped\n"
+    endif
+    normal `Z
+  endif
+endfunction
+command! StripTrailingWhitespace :call StripTrailingWhitespace()
+"}}}
+"{{{ Format text to appropriate width
+function! FormatTextWidth()
+    let l:cursor = synIDattr(synID(line("."),col("."),1),"name")
+    if l:cursor =~ "comment" || l:cursor =~ "string"
+    " formats string to max 72 col
+        set textwidth=72
+        normal gqj
+        set textwidth=79
+    else
+        normal gqj
+    end
+endfunction
+
+let s:syn_string = '\%(String\|Heredoc\|DoctestValue\|DocTest\|DocTest2\|BytesEscape\)$'
+" Test if the line is a string.  Accepts a column number to test.  If no 
+" column number is provided, test the first and last column of the line.
+function! s:is_string(line, ...)
+  return synIDattr(synID(a:line, a:0 ? a:1 : col([a:line, '$']) - 1, 1), 'name') =~? s:syn_string
+        \ && (a:0 || synIDattr(synID(a:line, 1, 1), 'name') =~? s:syn_string)
+endfunction
+"}}}
+command! FormatTextWidth :call FormatTextWidth()
+
+" autocmd BufWritePre python,html,htmldjango,css,js call StripTrailingWhitespace()
+nnoremap == :StripTrailingWhitespace<cr>:FormatTextWidth<cr>
+
 "tab
 " for command mode
 " for insert mode
@@ -391,6 +587,9 @@ set autoread                    " Refresh file if changed
 nnoremap <leader>ft :setlocal buftype=nofile bufhidden=hide noswapfile
 
 " {{{ watchforchanges
+
+" http://vim.wikia.com/wiki/Have_Vim_check_automatically_if_the_file_has_changed_externally
+
 " If you are using a console version of Vim, or dealing
 " with a file that changes externally (e.g. a web server log)
 " then Vim does not always check to see if the file has been changed.
@@ -567,7 +766,8 @@ set backspace=indent,eol,start  " allow backspace over these
 set virtualedit=onemore         " allows cursor beyond last char
 set scrolljump=7                " automatically scroll n when the cursor hits the edge
 set scrolloff=5                 " keep the cursor n lines from the edge
-set formatoptions=1 lbr         " linewrapping
+" set formatoptions=1lbrq         " linewrapping
+set formatoptions=1q         " linewrapping
 set ttyfast                     " send more characters to redraw
 set number                      " show line numbers
 set wrap                        " word wrap
@@ -581,7 +781,7 @@ set ignorecase
 set smartcase
 set regexpengine=1                     " use earlier regex implementation. faster results
 " turn off search highlight
-noremap <leader>/ :nohlsearch<CR>:call clearmatches()<cr>
+noremap <leader>/ :nohlsearch<CR>:call clearmatches()<cr>:IndentLinesEnable<cr>
 " }}}
 
 set ruler                       " Show cursor position in the status bar
@@ -818,13 +1018,15 @@ nnoremap z0 :set foldlevel=9<CR>
 "}}} 
 
 "{{{ neovim terminal
-nnoremap <A-t> :ToggleTerm<cr>
+nnoremap <c-t> :ToggleTerm<cr>
 tnoremap <Esc><Esc> <C-\><C-n>
 tnoremap <leader>h <C-\><C-n><C-w>h
 tnoremap <leader>j <C-\><C-n><C-w>j
 tnoremap <leader>k <C-\><C-n><C-w>k
 tnoremap <leader>l <C-\><C-n><C-w>l
-autocmd WinEnter term://* startinsert
+" automatically enter terminal mode
+autocmd BufWinEnter,WinEnter term://* startinsert
+
 " visor style terminal buffer
 let s:termbuf = 0
 function! ToggleTerm()
@@ -835,11 +1037,10 @@ function! ToggleTerm()
     catch
         terminal
         let s:termbuf=bufnr('%')
-        tnoremap <buffer> <A-t>  <C-\><C-n>:close<cr>
+        tnoremap <buffer> <c-t>  <C-\><C-n>:close<cr>
     endtry
 endfunction
-
-com! ToggleTerm call ToggleTerm()
+command! ToggleTerm call ToggleTerm()
 "}}}
 
 "{{{ Focus
@@ -899,6 +1100,17 @@ function! LongEnough( timer, delay, ... )
     return result
 endfunction
 "}}}
+
+
+function! CommentSection()
+    let l:save = winsaveview()
+    exec 's/^/'.b:comment_leader.'/'
+    call winrestview(l:save)
+endfunction
+function! UncommentSection()
+    exec 's/^'.b:comment_leader.'//e'
+endfunction
+
 "{{{ Commenting
 augroup commentleader
     " Implementation comments
@@ -911,16 +1123,19 @@ augroup commentleader
     " Commenting blocks of code.
 
     " default comment_leader
-    autocmd FileType *                      let b:comment_leader = '# '
+    let b:comment_leader = '# '
 
+    autocmd FileType *                      let b:comment_leader = '# '
     autocmd FileType c,cpp,cs               let b:comment_leader = '// '
     autocmd FileType java,javascript,scala  let b:comment_leader = '// '
+    autocmd FileType css                    let b:comment_leader = '// '
     autocmd FileType conf,fstab,apache,yaml let b:comment_leader = '# '
     autocmd FileType tex                    let b:comment_leader = '% '
     autocmd FileType mail                   let b:comment_leader = '> '
     autocmd FileType vim                    let b:comment_leader = '" '
     autocmd FileType sh,ruby                let b:comment_leader = '# '
     autocmd FileType python                 let b:comment_leader = '# '
+    autocmd FileType sql,pgsql              let b:comment_leader = '-- '
 
 
     " "<C-R>" pastes the register while "=escape()" assigns the register a
@@ -931,6 +1146,8 @@ augroup commentleader
     noremap <silent> <localleader>u
                 \ :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')
                 \ <CR>//e<CR>:nohlsearch<CR>
+
+
 
     autocmd FileType txt noremap <silent> <localleader>c
                 \ :<C-B>silent <C-E>s/^\(.*\)$/<!-- \1 -->/
@@ -945,7 +1162,13 @@ augroup commentleader
 
 augroup END
 "}}}
-
+function! EditMacro()
+  call inputsave()
+  let g:regToEdit = input('Register to edit: ')
+  call inputrestore()
+  execute "nnoremap <Plug>em :let @" . eval("g:regToEdit") . "='<C-R><C-R>" . eval("g:regToEdit")
+endfunction
+nmap <Leader>em :call EditMacro()<CR> <Plug>em
 "}}}
 
 "}}}
@@ -963,12 +1186,12 @@ augroup END
 "                 \ | highlight def link pythonSelf Special
 " augroup end
 
-" formats string to max 72 col
-nnoremap == :set textwidth=72<CR>gqj:set textwidth=79<CR>
 
 " autocmd FileType python nnoremap <buffer> <localleader><F5> :exec '!python' shellescape(@%, 1)<cr>
 autocmd FileType python nnoremap <buffer> <localleader>2 :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term python <c-r>=escape(g:current_file_name,'\/') <CR><cr>
 autocmd FileType python nnoremap <buffer> <localleader>3 :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term python3 <c-r>=escape(g:current_file_name,'\/') <CR><cr>
+autocmd FileType sql,pgsql nnoremap <buffer> <localleader>r :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term PAGER="less -S" psql lakeshore lakeshore_user -a -P null="<NULL>" -f <c-r>=escape(g:current_file_name,'\/') <CR><cr>
+"-P format=wrapped 
 
 " autocmd FileType python call LoadPymode()
 
@@ -992,11 +1215,11 @@ autocmd FileType python noremap <silent> <localleader><
 " autocmd FileType python match OverLength /\%<73v.\%>72v/
 autocmd FileType python map <localleader>n O# Note:<cr>"""<cr>"""<esc>O
 autocmd FileType python map <localleader>t O# TODO:<cr>"""<cr>"""<esc>O
-autocmd BufRead,BufNewFile *.html set filetype=htmldjango
+autocmd BufRead,BufNewFile *.html set filetype=htmldjango shiftwidth=2 tabstop=2
 "}}}
 
 "{{{ reStructured Text
-let $rst=g:vim_directory.'/bundle/personal/plugin/rst.vim'
+" let $rst=g:vim_directory.'/bundle/personal/plugin/rst.vim'
 "}}}
 
 "{{{ markdown
