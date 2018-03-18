@@ -170,6 +170,8 @@ Plug 'danetrata/vimwiki', { 'do': 'LoadVimWiki' , 'branch': 'dev' }
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } | Plug 'davidhalter/jedi-vim'
 " Automated document generation
 Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets'
+" Grep
+Plug 'vim-scripts/grep.vim'
 
 " Completions and snippets
 Plug 'jiangmiao/auto-pairs'
