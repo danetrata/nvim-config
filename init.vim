@@ -59,7 +59,29 @@ nnoremap <leader>n :call NumberToggle()<cr>
 
 "{{{ Rainbow
 " Use a particular color scheme
-let g:rainbow_active = 1
+let g:rainbow_active = 0
+	let g:rainbow_conf = {
+	\	'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
+	\	'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+	\	'operators': '_,_',
+	\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+	\	'separately': {
+	\		'*': {},
+	\		'tex': {
+	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
+	\		},
+	\		'lisp': {
+	\			'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
+	\		},
+	\		'vim': {
+	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+	\		},
+	\		'html': {
+	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+	\		},
+	\		'css': 0,
+	\	}
+	\}
 "}}}
 
 "{{{ Gundo
@@ -92,7 +114,7 @@ let g:pymode_options_colorcolumn = 0
 " ignore error code for unnecessary parenthesis
 " ignore import errors
 " let g:pymode_lint_ignore = "C0325, F0401"
-let g:pymode_lint_ignore = 'E501, C0301, C0411'
+let g:pymode_lint_ignore = ['E501', 'C0301', 'C0411']
 " use these error checkers
 let g:pymode_lint_checkers = ['mccabe', 'pep8', 'pyflakes', 'pylint']
 let g:pymode_rope_rename_bind = '<leader>r'
@@ -160,9 +182,9 @@ command! LoadPymode :call LoadPymode({'none': 'none'})
 " command! LocationToggle :call LocationToggle()
 " FIXME: Fix toggle behavior. An example below.
 " nnoremap <leader>q :call QuickfixToggle()<cr>
-" 
+"
 " let g:quickfix_is_open = 0
-" 
+"
 " function! QuickfixToggle()
 "     if g:quickfix_is_open
 "         cclose
@@ -200,12 +222,12 @@ let g:neosnippet#snippets_directory = [ g:vim_directory."/bundle",
             \ g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
             \ g:vim_directory."/bundle/vim-snippets/snippets" ]
 imap <expr><TAB> pumvisible() ?
-            \ "\<C-n>" : 
+            \ "\<C-n>" :
                 \ (neosnippet#expandable_or_jumpable() ?
-                \ "\<Plug>(neosnippet_expand_or_jump)" : "\<c-t>") 
+                \ "\<Plug>(neosnippet_expand_or_jump)" : "\<c-t>")
 imap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<c-d>"
-imap <expr><CR> pumvisible() ? 
-            \ deoplete#close_popup() : 
+imap <expr><CR> pumvisible() ?
+            \ deoplete#close_popup() :
                 \ (neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<CR>")
 "                 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<CR>\<Plug>AutoPairsReturn")
@@ -231,12 +253,18 @@ let NERDTreeMapOpenInTab='<ENTER>'
 "}}}
 
 "{{{ airline config
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#tab_nr_type = 2 " splits and tab number
-let g:airline#extensions#bufferline#enabled = 0
-let g:airline#extensions#tabline#show_buffers = 0
+" let g:airline_section_x = ''
 
-" let g:airline#extensions#tabline#buffer_idx_mode = 1
+let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#tab_nr_type = 2 " splits and tab number
+" let g:airline#extensions#bufferline#enabled = 0
+let g:airline#extensions#tabline#show_buffers = 0
+let g:airline#extensions#tabline#show_tab_nr = 1
+
+" let g:airline#extensions#tabline#tabnr_formatter = 'tabnr'
+let g:airline#extensions#tabline#tab_nr_type = 1 " tab number
+
+let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap g1 <Plug>AirlineSelectTab1
 nmap g2 <Plug>AirlineSelectTab2
 nmap g3 <Plug>AirlineSelectTab3
@@ -246,7 +274,7 @@ nmap g6 <Plug>AirlineSelectTab6
 nmap g7 <Plug>AirlineSelectTab7
 nmap g8 <Plug>AirlineSelectTab8
 nmap g9 <Plug>AirlineSelectTab9
-"}}} 
+"}}}
 
 "{{{ tmux_navigator
 let g:tmux_navigator_disable_when_zoomed = 1
@@ -278,7 +306,7 @@ nnoremap <silent> <Leader>gj <Plug>(CommandTJump)
 "{{{ Ack
 " ack with insensitive literal search.
 " note the trailing whitespace
-nnoremap <leader>a :Ack! -iF 
+nnoremap <leader>a :Ack! -iF
 "}}}
 
 " {{{ pgsql
@@ -314,6 +342,9 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 0
 let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
+let g:syntastic_enable_highlighting = 0
+let g:syntastic_enable_signs = 0
+let g:syntastic_echo_current_error = 0
 let g:syntastic_mode_map = {
     \ "mode": "active",
     \ "active_filetypes": [],
@@ -325,11 +356,16 @@ nmap <silent> <localleader>d <Plug>(pydocstring)
 "}}}
 
 "{{{ easytags
-let g:easytasgs_async = 1
+let g:easytags_async = 1
 "}}}
 
 "{{{ atags
 " autocmd BufWritePost * call atags#generate()
+" let g:atags_build_commands_list = [
+"         \ 'ag -g "" | ctags -L - --fields=+l -f tags.tmp',
+"         \ 'awk "length($0) < 400" tags.tmp > tags',
+"         \ 'rm tags.tmp'
+"         \ ]
 "}}}
 
 "{{{ vim-autoformat
@@ -339,13 +375,18 @@ noremap <leader>f :Autoformat<cr>
 
 "{{{ splitjoin
 nmap sj :SplitjoinSplit<cr>
-nmap sk :SplitjoinJoin<cr> 
+nmap sk :SplitjoinJoin<cr>
 "}}}
 
-"{{{
+"{{{ bufferline
 let g:bufferline_echo = 1
 let g:bufferline_rotate = 2
 "}}}
+
+"{{{ jshint
+let JSHintUpdateWriteOnly=1
+"}}}
+
 "}}}
 
 "{{{ Runtime
@@ -368,13 +409,15 @@ Plug 'luochen1990/rainbow'
 Plug 'sjl/gundo.vim'
 " Color scheme
 Plug 'sjl/badwolf'
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'morhetz/gruvbox'
 " Show indent levels
 " Might be slow. If that's the case, then let g:indentLine_faster = 1
 Plug 'Yggdroot/indentLine'
 " Advanced status line
 Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 " Bottom bar buffer line
-Plug 'bling/vim-bufferline'
+" Plug 'bling/vim-bufferline'
 " Easy character alignment
 Plug 'godlygeek/tabular'
 " Quick posting to Gist
@@ -417,7 +460,7 @@ Plug 'vim-ctrlspace/vim-ctrlspace'
 Plug 'Konfekt/FastFold'
 
 " Tag generation
-" Plug 'xolox/vim-easytags' | Plug 'xolox/vim-misc' | Plug 'xolox/vim-shell'
+Plug 'xolox/vim-easytags' | Plug 'xolox/vim-misc' | Plug 'xolox/vim-shell'
 " Tag generation
 " Plug 'fntlnz/atags.vim'
 " Tag overview
@@ -441,11 +484,11 @@ Plug 'vim-syntastic/syntastic'
 
 " Python client
 " Completions and snippets
-Plug 'zchee/deoplete-jedi', { 'for': 'python' }
+Plug 'zchee/deoplete-jedi', {'for': 'python'}
 " Neovim specific improvements
 Plug 'neovim/python-client', {'for' : 'python'}
 " Large library of python specific functions
-Plug 'python-mode/python-mode', {'for' : 'python', 'branch' : 'master'}
+Plug 'python-mode/python-mode', {'for' : 'python', 'branch' : 'develop'}
 autocmd! User python-mode LoadPymode
 " Autodoc generation
 Plug 'heavenshell/vim-pydocstring'
@@ -466,6 +509,9 @@ Plug 'swekaj/php-foldexpr.vim', {'for' : 'php'}
 Plug 'lifepillar/pgsql.vim'
 Plug 'vim-scripts/SQLUtilities'
 
+" JavaScript
+Plug 'wookiehangover/jshint.vim'
+
 call plug#end()
 
 
@@ -482,7 +528,7 @@ call plug#end()
 
 "{{{ Look and Form
 " rename screen title
-autocmd BufEnter * let &titlestring = ' ' . expand("%:t")             
+autocmd BufEnter * let &titlestring = ' ' . expand("%:t")
 filetype plugin indent on              " load filetype-specific indent files
 syntax enable                          " enable syntax processing
 let g:tex_conceal = ''                 " Show all formatting characters
@@ -490,19 +536,36 @@ let g:tex_conceal = ''                 " Show all formatting characters
 set gfn=Monospace\ 12                  " font
 set showcmd                            " show command in bottom bar
 set title                              " rename terminal
-" set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L]\ (%p%%)\ 
+" set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L]\ (%p%%)\
 "             \\ %{SyntasticStatuslineFlag()} " detailed command bar
 set history=200                        " a longer command history
 set wildmenu                           " visual autocomplete for command menu
 " set lines=30 columns=85
 " color {{{
+
 if has("gui_running")
-    colorscheme badwolf
-    let g:airline_theme='badwolf'
+    colorscheme gruvbox
+    let g:airline_theme='gruvbox'
+    let g:gruvbox_contrast_light='hard'
+
+"     set background=light
+"     colorscheme PaperColor
+"     let g:airline_theme='PaperColor'
+
+"     colorscheme badwolf
+"     let g:airline_theme='badwolf'
 else
-    colorscheme badwolf
+    colorscheme gruvbox
+    let g:airline_theme='gruvbox'
+    let g:gruvbox_contrast_light='hard'
+
+"     set background=light
+"     colorscheme PaperColor
+
+"     colorscheme badwolf
 endif
-"  spaces and tabs {{{
+
+" spaces and tabs {{{
 syntax on                                "  allows vim to highlight language syntax based on filetype
 syntax sync minlines=256                 "  speed up syntax. The trade off is there might be some inaccuracies with highlighting
 set synmaxcol=400                        "  fixes slow downs with really long lines
@@ -542,7 +605,7 @@ function! FormatTextWidth()
 endfunction
 
 let s:syn_string = '\%(String\|Heredoc\|DoctestValue\|DocTest\|DocTest2\|BytesEscape\)$'
-" Test if the line is a string.  Accepts a column number to test.  If no 
+" Test if the line is a string.  Accepts a column number to test.  If no
 " column number is provided, test the first and last column of the line.
 function! s:is_string(line, ...)
   return synIDattr(synID(a:line, a:0 ? a:1 : col([a:line, '$']) - 1, 1), 'name') =~? s:syn_string
@@ -553,6 +616,8 @@ command! FormatTextWidth :call FormatTextWidth()
 
 " autocmd BufWritePre python,html,htmldjango,css,js call StripTrailingWhitespace()
 nnoremap == :StripTrailingWhitespace<cr>:FormatTextWidth<cr>
+vnoremap == :s/, /,/g
+" :map q :%s/Name. /\^V^V^M&/g^M
 
 "tab
 " for command mode
@@ -842,12 +907,12 @@ noremap W $l
 " highlight last inserted text
 nnoremap gV '[v']
 "moving line up/down
-nnoremap <M-j> ddp 
-nnoremap <M-k> ddkP 
+nnoremap <M-j> ddp
+nnoremap <M-k> ddkP
 nnoremap <M><down> ddp
 nnoremap <M><up> ddkP
 "join up
-nnoremap <s-k> k<s-j>
+" nnoremap <s-k> k<s-j>
 "move between panes
 noremap <C-l> <C-w>l
 noremap <C-h> <C-w>h
@@ -871,6 +936,8 @@ nnoremap `n :tabn<cr>
 nnoremap `N :tabp<cr>
 " replace the current word with yank
 nnoremap <leader>cc viwc<C-R>0<esc>
+" delete selection into blackhole. Allows us to paste many times over different selections.
+vnoremap p "_dP
 " Map Ctrl-BS and Ctrl-Del to delete the previous word in insert mode.
 imap <C-BS> <C-W>
 imap <C-del> <esc>lvedi
@@ -896,7 +963,7 @@ syn include @SQL syntax/sql.vim
 syn region SQLEmbedded start=+\z(['"]\)\zs[\s\n]*\v(ALTER|CALL|COMMENT|COMMIT|CONNECT|CREATE|DELETE|DROP|EXPLAIN|EXPORT|GRANT|IMPORT|INSERT|LOAD|LOCK|MERGE|REFRESH|RENAME|REPLACE|REVOKE|ROLLBACK|SELECT|SET|TRUNCATE|UNLOAD|UNSET|UPDATE|UPSERT)+ skip=+\\\z1+ end=+\ze\z1+ contains=@SQL containedin=pythonString
 
 let b:current_syntax = "pysql"
-"{{{ surround 
+"{{{ surround
 " makes adding parenthesis easy
 let g:surround_40 = "(\r)"
 let g:surround_91 = "[\r]"
@@ -910,7 +977,7 @@ function! SpellToggle()
         echom "SPELL CHECK OFF. "
         set nospell
     else " currently disabled, set to enable
-        echom "SPELL CHECK ON. Suggestions:z= next:]s" 
+        echom "SPELL CHECK ON. Suggestions:z= next:]s"
         setlocal spell spelllang=en_us
     endif
 endfunc
@@ -1015,7 +1082,7 @@ nnoremap z7 :set foldlevel=6<CR>
 nnoremap z8 :set foldlevel=7<CR>
 nnoremap z9 :set foldlevel=8<CR>
 nnoremap z0 :set foldlevel=9<CR>
-"}}} 
+"}}}
 
 "{{{ neovim terminal
 nnoremap <c-t> :ToggleTerm<cr>
@@ -1115,7 +1182,7 @@ endfunction
 augroup commentleader
     " Implementation comments
     " au[tocmd] [group] {event} {patern} [nested] {cmd}
-    " group = [aug[roup], ...] 
+    " group = [aug[roup], ...]
     "   examples: aug_new
     " event = [VimEnter, BufWritePre, FileType, BufEnter, ...]
     " FileTypePattern = [python, cpp, rst, ...]
@@ -1157,7 +1224,7 @@ augroup commentleader
                 \ <CR>:nohlsearch<CR>
 
     " Aligns comments based on comment leader
-    noremap <silent> <localleader><Tab> 
+    noremap <silent> <localleader><Tab>
                 \ :Tab /<C-R>=escape(b:comment_leader,'\/')<CR><CR>
 
 augroup END
@@ -1169,6 +1236,8 @@ function! EditMacro()
   execute "nnoremap <Plug>em :let @" . eval("g:regToEdit") . "='<C-R><C-R>" . eval("g:regToEdit")
 endfunction
 nmap <Leader>em :call EditMacro()<CR> <Plug>em
+
+command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | diffthis
 "}}}
 
 "}}}
@@ -1191,7 +1260,7 @@ nmap <Leader>em :call EditMacro()<CR> <Plug>em
 autocmd FileType python nnoremap <buffer> <localleader>2 :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term python <c-r>=escape(g:current_file_name,'\/') <CR><cr>
 autocmd FileType python nnoremap <buffer> <localleader>3 :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term python3 <c-r>=escape(g:current_file_name,'\/') <CR><cr>
 autocmd FileType sql,pgsql nnoremap <buffer> <localleader>r :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term PAGER="less -S" psql lakeshore lakeshore_user -a -P null="<NULL>" -f <c-r>=escape(g:current_file_name,'\/') <CR><cr>
-"-P format=wrapped 
+"-P format=wrapped
 
 " autocmd FileType python call LoadPymode()
 
@@ -1215,7 +1284,7 @@ autocmd FileType python noremap <silent> <localleader><
 " autocmd FileType python match OverLength /\%<73v.\%>72v/
 autocmd FileType python map <localleader>n O# Note:<cr>"""<cr>"""<esc>O
 autocmd FileType python map <localleader>t O# TODO:<cr>"""<cr>"""<esc>O
-autocmd BufRead,BufNewFile *.html set filetype=htmldjango shiftwidth=2 tabstop=2
+autocmd BufRead,BufNewFile *.html set filetype=htmldjango shiftwidth=4 tabstop=4
 "}}}
 
 "{{{ reStructured Text
@@ -1225,15 +1294,15 @@ autocmd BufRead,BufNewFile *.html set filetype=htmldjango shiftwidth=2 tabstop=2
 "{{{ markdown
 augroup filetypedetect_md
     au!
-    
+
     " Headings
     au FileType md nnoremap <leader>h1 ^yypv$r=o<cr><esc>
     au FileType md inoremap <leader>h1 <esc>^yypv$r=o<cr>
 
-    au FileType md nnoremap <leader>h2 ^yypv$r-o 
+    au FileType md nnoremap <leader>h2 ^yypv$r-o
                 \<cr><cr><cr><cr><cr><cr><esc> kkkk
     au FileType md inoremap <leader>h2 <esc>^yypv$r-o
-                \<cr><cr><cr><cr><cr><cr><esc>kkkki 
+                \<cr><cr><cr><cr><cr><cr><esc>kkkki
     au FileType md nnoremap <leader>h3 ^yypv$r+o
                 \<cr><cr><cr><cr><cr><cr><esc>kkkk
     au FileType md inoremap <leader>h3 <esc>^yypv$r+o
@@ -1269,7 +1338,7 @@ augroup filetypedetect_md
                 \<cr>:alt: TODO<cr><cr><cr>Some brief description<esc>kkkeel
 
     "Create note
-    au FileType md iabbrev nnn .. note:: 
+    au FileType md iabbrev nnn .. note::
     "Start or end bold text inline
     au FileType md inoremap <leader>bb **
     "Start or end italicized text inline
@@ -1279,12 +1348,12 @@ augroup filetypedetect_md
 
     " Fold settings
     "au FileType md set foldmethod=marker
-    
+
     " Admonitions
     au FileType md iabbrev adw .. warning::
     au FileType md iabbrev adn .. note::
 augroup END
-" }}} 
+" }}}
 
 "{{{ c/c++
     autocmd FileType cpp set cindent      " - stricter rules for C programs
@@ -1311,12 +1380,12 @@ set modelines=1
 nnoremap <leader><leader><leader><leader> :call SourceVimrc()<cr>
 nnoremap <leader><leader><leader> :execute 'tabedit '.g:vim_directory.'/init.vim'<CR>
 " insert fold
-vmap <localleader>zf Vc<cr><esc>zf<cr>pkA 
+vmap <localleader>zf Vc<cr><esc>zf<cr>pkA
 "{{{ Reload vimrc
 function! SourceVimrc()
     execute 'source '.g:vim_directory.'/init.vim'
     echom "new vimrc loaded!"
-    execute 'syntax sync fromstart' 
+    execute 'syntax sync fromstart'
 endfunction
 "}}}
 "}}}

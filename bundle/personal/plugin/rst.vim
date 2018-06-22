@@ -62,7 +62,6 @@ function! Rst()
     " Admonitions
     iabbrev adw .. warning::
     iabbrev adn .. note::
-
 endfunction
 
-autocmd FileType rst call Rst()
+" autocmd FileType rst call Rst()
