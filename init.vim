@@ -306,7 +306,9 @@ nnoremap <silent> <Leader>gj <Plug>(CommandTJump)
 "{{{ Ack
 " ack with insensitive literal search.
 " note the trailing whitespace
-nnoremap <leader>a :Ack! -iF
+" let g:ack_autofold_results = 1
+
+nnoremap <leader>a :Ack! -i 
 "}}}
 
 " {{{ pgsql
@@ -387,6 +389,34 @@ let g:bufferline_rotate = 2
 let JSHintUpdateWriteOnly=1
 "}}}
 
+"{{{ vim-rooter
+let g:rooter_manual_only = 1
+
+function! LoadAck(info)
+    let g:project_directory = FindRootDirectory()
+    nnoremap <leader>ga :execute 'Ack! --ignore-dir=env '.expand('<cWORD>').' '.g:project_directory<cr>
+endfunction
+command! LoadAck :call LoadAck({'none': 'none'})
+
+" function! AckWordLocal()
+" 
+"     expand("<cWORD>")
+"     execute 'source '.g:vim_directory.'/init.vim'
+"   if search('\s\+$') > 0
+"     echom "Trailing whitespace found\n"
+"     normal mZ
+"     let l:chars = col("$")
+"     %s/\s\+$//ec
+"     if (line("'Z") != line(".")) || (l:chars != col("$"))
+"         echom "Trailing whitespace stripped\n"
+"     endif
+"     normal `Z
+"   endif
+" endfunction
+" command! AckWordLocal :call AckWordLocal()
+
+"}}}
+
 "}}}
 
 "{{{ Runtime
@@ -437,6 +467,8 @@ autocmd! User vimwiki LoadVimWiki
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } | Plug 'davidhalter/jedi-vim'
 " Automated document generation
 Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets'
+" Grep
+Plug 'vim-scripts/grep.vim'
 " Large files
 Plug 'vim-scripts/LargeFile'
 " version control signs
@@ -455,6 +487,9 @@ Plug 'jlanzarotta/bufexplorer'
 Plug 'chrisbra/NrrwRgn'
 " Fuzzy search, tab and buffer management, and so much more
 Plug 'vim-ctrlspace/vim-ctrlspace'
+" Return the the root project directory
+Plug 'airblade/vim-rooter', { 'do': ':LoadAck' }
+autocmd! User rooter LoadAck
 
 " faster folding, better than pymode
 Plug 'Konfekt/FastFold'
