@@ -218,18 +218,23 @@ let g:deoplete#enable_at_startup = 1
 let g:echo = 1
 let g:deoplete#auto_complete_start_length = 1
 let g:deoplete#enable_smart_case = 1
-let g:neosnippet#snippets_directory = [ g:vim_directory."/bundle",
-            \ g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
-            \ g:vim_directory."/bundle/vim-snippets/snippets" ]
-imap <expr><TAB> pumvisible() ?
-            \ "\<C-n>" :
-                \ (neosnippet#expandable_or_jumpable() ?
-                \ "\<Plug>(neosnippet_expand_or_jump)" : "\<c-t>")
-imap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<c-d>"
-imap <expr><CR> pumvisible() ?
-            \ deoplete#close_popup() :
-                \ (neosnippet#expandable_or_jumpable() ?
-                \ "\<Plug>(neosnippet_expand_or_jump)" : "\<CR>")
+
+" let g:neosnippet#snippets_directory = [ g:vim_directory."/bundle",
+"             \ g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
+"             \ g:vim_directory."/bundle/vim-snippets/snippets" ]
+
+" imap <expr><TAB> pumvisible() ?
+"             \ "\<C-n>" :
+"                 \ (neosnippet#expandable_or_jumpable() ?
+"                 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<c-t>")
+" imap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<c-d>"
+" 
+" " mutliple actions for <CR> based on context
+" imap <expr><CR> pumvisible() ?
+"             \ deoplete#close_popup() :
+"                 \ (neosnippet#expandable_or_jumpable() ?
+"                 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<CR>")
+
 "                 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<CR>\<Plug>AutoPairsReturn")
 " imap <expr><CR> pumvisible() ? "<CR>" : "\<CR>\<Plug>AutoPairsReturn"
 "}}}
@@ -348,7 +353,7 @@ let g:syntastic_enable_highlighting = 0
 let g:syntastic_enable_signs = 0
 let g:syntastic_echo_current_error = 0
 let g:syntastic_mode_map = {
-    \ "mode": "active",
+    \ "mode": "passive",
     \ "active_filetypes": [],
     \ "passive_filetypes": [] }
 "}}}
@@ -466,15 +471,15 @@ autocmd! User vimwiki LoadVimWiki
 " Asynchronous keyword completion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } | Plug 'davidhalter/jedi-vim'
 " Automated document generation
-Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets'
+" Plug 'Shougo/neosnippet.vim' | Plug 'Shougo/neosnippet-snippets'
 " Grep
 Plug 'vim-scripts/grep.vim'
 " Large files
 Plug 'vim-scripts/LargeFile'
 " version control signs
-Plug 'mhinz/vim-signify'
+" Plug 'mhinz/vim-signify'
 " file version control signs
-Plug 'Xuyuanp/nerdtree-git-plugin'
+" Plug 'Xuyuanp/nerdtree-git-plugin'
 " fuzzy file search
 Plug 'wincent/Command-T'
 " grep in vim
@@ -512,14 +517,14 @@ Plug 'Shougo/neco-vim', { 'for': 'vim' }
 " Plug 'Shougo/neosnippet' | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
 Plug 'Shougo/context_filetype.vim'
 " Plug 'SirVer/ultisnips' | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
-Plug 'garbas/vim-snipmate' | Plug 'MarcWeber/vim-addon-mw-utils' | Plug 'tomtom/tlib_vim'  | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
+" Plug 'garbas/vim-snipmate' | Plug 'MarcWeber/vim-addon-mw-utils' | Plug 'tomtom/tlib_vim'  | Plug 'Shougo/neosnippet-snippets' | Plug 'honza/vim-snippets'
 
 " Syntax checker
 Plug 'vim-syntastic/syntastic'
 
 " Python client
 " Completions and snippets
-Plug 'zchee/deoplete-jedi', {'for': 'python'}
+" Plug 'zchee/deoplete-jedi', {'for': 'python'}
 " Neovim specific improvements
 Plug 'neovim/python-client', {'for' : 'python'}
 " Large library of python specific functions
