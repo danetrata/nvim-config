@@ -60,28 +60,28 @@ nnoremap <leader>n :call NumberToggle()<cr>
 "{{{ Rainbow
 " Use a particular color scheme
 let g:rainbow_active = 0
-	let g:rainbow_conf = {
-	\	'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
-	\	'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
-	\	'operators': '_,_',
-	\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
-	\	'separately': {
-	\		'*': {},
-	\		'tex': {
-	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
-	\		},
-	\		'lisp': {
-	\			'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
-	\		},
-	\		'vim': {
-	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
-	\		},
-	\		'html': {
-	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
-	\		},
-	\		'css': 0,
-	\	}
-	\}
+    let g:rainbow_conf = {
+    \   'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
+    \   'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+    \   'operators': '_,_',
+    \   'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+    \   'separately': {
+    \       '*': {},
+    \       'tex': {
+    \           'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
+    \       },
+    \       'lisp': {
+    \           'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
+    \       },
+    \       'vim': {
+    \           'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+    \       },
+    \       'html': {
+    \           'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+    \       },
+    \       'css': 0,
+    \   }
+    \}
 "}}}
 
 "{{{ Gundo
@@ -102,7 +102,8 @@ command! LoadVimWiki :call LoadVimWiki({'none': 'none'})
 
 "{{{ Deoplete
 " let g:deoplete#enable_at_startup = 1
-let g:deoplete#auto_complete_delay = 500
+let g:deoplete#auto_complete = v:false
+" let g:deoplete#auto_complete_delay = 500
 "}}}
 
 "{{{ Pymode
@@ -114,7 +115,7 @@ let g:pymode_options_colorcolumn = 0
 " ignore error code for unnecessary parenthesis
 " ignore import errors
 " let g:pymode_lint_ignore = "C0325, F0401"
-let g:pymode_lint_ignore = ['E501', 'C0301', 'C0411']
+let g:pymode_lint_ignore = ['E501', 'C0301', 'C0411', 'C901', 'W605']
 " use these error checkers
 let g:pymode_lint_checkers = ['mccabe', 'pep8', 'pyflakes', 'pylint']
 let g:pymode_rope_rename_bind = '<leader>r'
@@ -146,23 +147,23 @@ let g:pymode_doc = 0
 " let g:pymode_syntax_docstrings = 1
 
 
-python3 << EOF
-import vim
-import git
-def is_git_repo():
-    try:
-        _ = git.Repo('.', search_parent_directories=True).git_dir
-        return "1"
-    except:
-        return "0"
-vim.command("let g:pymode_rope = " + is_git_repo())
-EOF
+" python3 << EOF
+" import vim
+" import git
+" def is_git_repo():
+"     try:
+"         _ = git.Repo('.', search_parent_directories=True).git_dir
+"         return "1"
+"     except:
+"         return "0"
+" vim.command("let g:pymode_rope = " + is_git_repo())
+" EOF
 
-function! LoadPymode(info)
+function! LoadPymode()
     nnoremap <localleader>l :PymodeLint<cr>:vert lopen<cr><cr>
     nnoremap <LocalLeader>L :PymodeLintAuto<cr>
 endfunction
-command! LoadPymode :call LoadPymode({'none': 'none'})
+command! LoadPymode :call LoadPymode()
 
 " let b:location_open = 0
 " function! LocationToggle()
@@ -216,8 +217,6 @@ let g:jedi#usages_command = '<leader>gu'
 let g:AutoClosePreserveEnterMapping = 1
 let g:deoplete#enable_at_startup = 1
 let g:echo = 1
-let g:deoplete#auto_complete_start_length = 1
-let g:deoplete#enable_smart_case = 1
 
 " let g:neosnippet#snippets_directory = [ g:vim_directory."/bundle",
 "             \ g:vim_directory."/bundle/neosnippet-snippets/neosnippets",
@@ -237,6 +236,21 @@ let g:deoplete#enable_smart_case = 1
 
 "                 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<CR>\<Plug>AutoPairsReturn")
 " imap <expr><CR> pumvisible() ? "<CR>" : "\<CR>\<Plug>AutoPairsReturn"
+
+set completeopt=longest,menuone
+
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+inoremap <expr> <C-n> pumvisible() ? '<C-n>' :
+  \ '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+inoremap <expr> <M-,> pumvisible() ? '<C-n>' :
+  \ '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+
+imap <expr><TAB> pumvisible() ?
+            \ "\<C-n>" : "\<c-t>"
+imap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<c-d>"
+
+"
+
 "}}}
 
 "{{{ indentLine
@@ -356,14 +370,30 @@ let g:syntastic_mode_map = {
     \ "mode": "passive",
     \ "active_filetypes": [],
     \ "passive_filetypes": [] }
+let g:syntastic_javascript_checkers = ["jshint", "jslint"]
 "}}}
 
 "{{{ PyDocString
 nmap <silent> <localleader>d <Plug>(pydocstring)
+nmap <silent> <C-_> <Plug>(pydocstring)
 "}}}
 
 "{{{ easytags
 let g:easytags_async = 1
+"}}}
+
+"{{{ EasyMotion
+hi link EasyMotionTarget ErrorMsg
+hi link EasyMotionShade  Comment
+
+hi link EasyMotionTarget2First ErrorMsg
+hi link EasyMotionTarget2Second ErrorMsg
+
+hi link EasyMotionMoveHL ErrorMsg
+hi link EasyMotionIncSearch ErrorMsg
+
+let g:EasyMotion_use_upper = 1
+let g:EasyMotion_keys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ;'
 "}}}
 
 "{{{ atags
@@ -394,34 +424,6 @@ let g:bufferline_rotate = 2
 let JSHintUpdateWriteOnly=1
 "}}}
 
-"{{{ vim-rooter
-let g:rooter_manual_only = 1
-
-function! LoadAck(info)
-    let g:project_directory = FindRootDirectory()
-    nnoremap <leader>ga :execute 'Ack! --ignore-dir=env '.expand('<cWORD>').' '.g:project_directory<cr>
-endfunction
-command! LoadAck :call LoadAck({'none': 'none'})
-
-" function! AckWordLocal()
-" 
-"     expand("<cWORD>")
-"     execute 'source '.g:vim_directory.'/init.vim'
-"   if search('\s\+$') > 0
-"     echom "Trailing whitespace found\n"
-"     normal mZ
-"     let l:chars = col("$")
-"     %s/\s\+$//ec
-"     if (line("'Z") != line(".")) || (l:chars != col("$"))
-"         echom "Trailing whitespace stripped\n"
-"     endif
-"     normal `Z
-"   endif
-" endfunction
-" command! AckWordLocal :call AckWordLocal()
-
-"}}}
-
 "}}}
 
 "{{{ Runtime
@@ -446,6 +448,8 @@ Plug 'sjl/gundo.vim'
 Plug 'sjl/badwolf'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'morhetz/gruvbox'
+" Before and after mappings
+Plug 'tpope/vim-unimpaired'
 " Show indent levels
 " Might be slow. If that's the case, then let g:indentLine_faster = 1
 Plug 'Yggdroot/indentLine'
@@ -492,15 +496,16 @@ Plug 'jlanzarotta/bufexplorer'
 Plug 'chrisbra/NrrwRgn'
 " Fuzzy search, tab and buffer management, and so much more
 Plug 'vim-ctrlspace/vim-ctrlspace'
-" Return the the root project directory
-Plug 'airblade/vim-rooter', { 'do': ':LoadAck' }
-autocmd! User rooter LoadAck
+" Fuzzy search
+Plug 'kien/ctrlp.vim'
+" All the Fuzzy searches
+Plug 'junegunn/fzf'
 
 " faster folding, better than pymode
 Plug 'Konfekt/FastFold'
 
 " Tag generation
-Plug 'xolox/vim-easytags' | Plug 'xolox/vim-misc' | Plug 'xolox/vim-shell'
+" Plug 'xolox/vim-easytags' | Plug 'xolox/vim-misc' | Plug 'xolox/vim-shell'
 " Tag generation
 " Plug 'fntlnz/atags.vim'
 " Tag overview
@@ -554,6 +559,11 @@ Plug 'wookiehangover/jshint.vim'
 
 call plug#end()
 
+call deoplete#custom#option({
+    \ 'auto_complete': v:false,
+    \ 'smart_case': v:true,
+    \ })
+
 
 "}}}
 
@@ -584,6 +594,7 @@ set wildmenu                           " visual autocomplete for command menu
 " color {{{
 
 if has("gui_running")
+
     colorscheme gruvbox
     let g:airline_theme='gruvbox'
     let g:gruvbox_contrast_light='hard'
@@ -595,6 +606,7 @@ if has("gui_running")
 "     colorscheme badwolf
 "     let g:airline_theme='badwolf'
 else
+
     colorscheme gruvbox
     let g:airline_theme='gruvbox'
     let g:gruvbox_contrast_light='hard'
@@ -603,6 +615,8 @@ else
 "     colorscheme PaperColor
 
 "     colorscheme badwolf
+"     let g:airline_theme='badwolf'
+
 endif
 
 " spaces and tabs {{{
@@ -616,48 +630,6 @@ autocmd FileType yaml,yml set tabstop=2 shiftwidth=2
 set expandtab                            "  tabs are spaces
 set list listchars=tab:▷⋅,trail:⋅,nbsp:⋅ "  highlights whitespace
 
-"{{{ remove trailing whitespace on save
-function! StripTrailingWhitespace()
-  if search('\s\+$') > 0
-    echom "Trailing whitespace found\n"
-    normal mZ
-    let l:chars = col("$")
-    %s/\s\+$//ec
-    if (line("'Z") != line(".")) || (l:chars != col("$"))
-        echom "Trailing whitespace stripped\n"
-    endif
-    normal `Z
-  endif
-endfunction
-command! StripTrailingWhitespace :call StripTrailingWhitespace()
-"}}}
-"{{{ Format text to appropriate width
-function! FormatTextWidth()
-    let l:cursor = synIDattr(synID(line("."),col("."),1),"name")
-    if l:cursor =~ "comment" || l:cursor =~ "string"
-    " formats string to max 72 col
-        set textwidth=72
-        normal gqj
-        set textwidth=79
-    else
-        normal gqj
-    end
-endfunction
-
-let s:syn_string = '\%(String\|Heredoc\|DoctestValue\|DocTest\|DocTest2\|BytesEscape\)$'
-" Test if the line is a string.  Accepts a column number to test.  If no
-" column number is provided, test the first and last column of the line.
-function! s:is_string(line, ...)
-  return synIDattr(synID(a:line, a:0 ? a:1 : col([a:line, '$']) - 1, 1), 'name') =~? s:syn_string
-        \ && (a:0 || synIDattr(synID(a:line, 1, 1), 'name') =~? s:syn_string)
-endfunction
-"}}}
-command! FormatTextWidth :call FormatTextWidth()
-
-" autocmd BufWritePre python,html,htmldjango,css,js call StripTrailingWhitespace()
-nnoremap == :StripTrailingWhitespace<cr>:FormatTextWidth<cr>
-vnoremap == :s/, /,/g
-" :map q :%s/Name. /\^V^V^M&/g^M
 
 "tab
 " for command mode
@@ -690,6 +662,164 @@ set autochdir                   " always change the current directory to match b
 set autoread                    " Refresh file if changed
 
 nnoremap <leader>ft :setlocal buftype=nofile bufhidden=hide noswapfile
+
+"{{{ remove trailing whitespace on save
+function! StripTrailingWhitespace()
+  if search('\s\+$') > 0
+    echom "Trailing whitespace found\n"
+    normal mZ
+    let l:chars = col("$")
+    %s/\s\+$//ec
+    if (line("'Z") != line(".")) || (l:chars != col("$"))
+        echom "Trailing whitespace stripped\n"
+    endif
+    normal `Z
+  endif
+endfunction
+command! StripTrailingWhitespace :call StripTrailingWhitespace()
+"}}}
+"
+
+" " funct! Exec(command)
+" "     let l:command=substitute(a:command, "\r", "", "g")
+" "     redir => output
+" "     silent exec l:command
+" "     redir END
+" "     return output
+" " endfunct
+" " 
+" " function! AckWordLocal()
+" "     let l:project_directory = Exec("!hg root")
+" "     execute 'echom '.l:project_directory
+" " "     execute 'Ack! --ignore-dir=env '.expand('<cword>').' '.l:project_directory
+" " 
+" " "     redir => m | silent :!hg root | redir END | put=m
+" " "     execute 'echom '.m
+" " "     execute 'Ack! --ignore-dir=env '.expand('<cword>').' '.m
+" " endfunction
+"     " "<C-R>" pastes the register while "=escape()" assigns the register a
+"     " value
+"     noremap <silent> <localleader>c
+"                 \ :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')
+"                 \ <CR>/<CR>:nohlsearch<CR>
+" 
+
+
+" "     execute 'echom '.l:project_directory
+" 
+" "     execute 'Ack! --ignore-dir=env '.expand('<cword>').' '.l:project_directory
+" 
+" "     redir => m | silent :!hg root | redir END | put=m
+" "     execute 'echom '.m
+" "     execute 'Ack! --ignore-dir=env '.expand('<cword>').' '.m
+
+function! AckWordLocal()
+    let l:project_directory=system('hg root')
+    echom l:project_directory
+    let l:project_directory=substitute(l:project_directory, "\%000", "", "g")
+    echom l:project_directory
+    execute 'Ack! --ignore-dir=env '.expand('<cword>').' '.l:project_directory
+endfunction
+command! AckWordLocal :call AckWordLocal()
+nmap <localleader>gt :AckWordLocal<cr>
+
+command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+
+command! Temp :vert new | setlocal buftype=nofile bufhidden=hide noswapfile
+" command! -nargs=* -complete=shellcmd Root r !<args>
+
+
+"{{{ Format text to appropriate width
+function! FormatTextWidth()
+    let l:cursor = synIDattr(synID(line("."),col("."),1),"name")
+    if l:cursor =~ "comment" || l:cursor =~ "string" || l:cursor =~ "String" || l:cursor =~ "pythonString"
+    " formats string to max 72 col
+        set textwidth=72
+        normal gqj
+        set textwidth=79
+    else
+        normal gqj
+    end
+endfunction
+
+
+
+let s:syn_string = '\%(String\|Heredoc\|DoctestValue\|DocTest\|DocTest2\|BytesEscape\)$'
+" Test if the line is a string.  Accepts a column number to test.  If no
+" column number is provided, test the first and last column of the line.
+function! s:is_string(line, ...)
+  return synIDattr(synID(a:line, a:0 ? a:1 : col([a:line, '$']) - 1, 1), 'name') =~? s:syn_string
+        \ && (a:0 || synIDattr(synID(a:line, 1, 1), 'name') =~? s:syn_string)
+endfunction
+"}}}
+command! FormatTextWidth :call FormatTextWidth()
+
+function! ReformatMultiLines()
+  let brx = '^\s*"'
+  let erx = '"\s*$'
+  let fullrx = brx . '\(.\+\)' . erx
+  let startLine = line(".")
+  let endLine   = line(".")
+  while getline(startLine) =~ fullrx
+    let startLine -= 1
+  endwhile
+  if getline(endLine) =~ erx
+    let endLine += 1
+  endif
+  while getline(endLine) =~ fullrx
+    let endLine += 1
+  endwhile
+  if startLine != endLine
+    exec endLine . ' s/' . brx . '//'
+    exec startLine . ' s/' . erx . '//'
+    exec startLine . ',' . endLine . ' s/' . fullrx . '/\1/'
+    exec startLine . ',' . endLine . ' join'
+  endif
+  exec startLine
+  let orig_tw = &tw
+  if &tw == 0
+    let &tw = &columns
+    if &tw > 79
+      let &tw = 79
+    endif
+  endif
+  let &tw -= 3 " Adjust for missing quotes and space characters
+  exec "normal A%-%\<Esc>gqq"
+  let &tw = orig_tw
+  let endLine = search("%-%$")
+  exec endLine . ' s/%-%$//'
+  if startLine == endLine
+    return
+  endif
+  exec endLine
+  exec 'normal I"'
+  exec startLine
+  exec 'normal A "'
+  if endLine - startLine == 1
+    return
+  endif
+  let startLine += 1
+  while startLine != endLine
+    exec startLine
+    exec 'normal I"'
+    exec 'normal A "'
+    let startLine += 1
+  endwhile
+endfunction
+command! ReformatMultiLines :call ReformatMultiLines()
+nnoremap <localleader>gd :ReformatMultiLines<cr>
+
+" autocmd BufWritePre python,html,htmldjango,css,js call StripTrailingWhitespace()
+nnoremap == :StripTrailingWhitespace<cr>:FormatTextWidth<cr>
+vnoremap == :s/, /,/g
+nnoremap <localleader>g= :s/, /,/g
+nnoremap <localleader>g- :s/, /\=submatch(0)."\n".matchstr(getline('.'), '^\s*')/g:StripTrailingWhitespace<cr>
+" %s/my_pattern/\=submatch(0).", \n".matchstr(getline('.'), '^\s*').'some_other_text'/g
+
+nnoremap <localleader>ga :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+" :map q :%s/Name. /\^V^V^M&/g^M
 
 " {{{ watchforchanges
 
@@ -984,7 +1114,7 @@ imap <C-del> <esc>lvedi
 " save session
 nnoremap <leader>s :mksession <CR>
 " highlight text at col 81 and show indentlines
-nnoremap <leader><bar> :call matchadd('ColorColumn', '\%81v', 100)<cr>:IndentLinesEnable<cr>
+nnoremap <leader><bar> :call matchadd('ColorColumn', '\%80v', 100)<cr>:call matchadd('ColorColumn', '\%120v', 100)<cr>:IndentLinesEnable<cr>
 
 if exists("b:current_syntax")
   finish
@@ -1233,6 +1363,7 @@ augroup commentleader
     let b:comment_leader = '# '
 
     autocmd FileType *                      let b:comment_leader = '# '
+    autocmd FileType hgcommit               let b:comment_leader = 'HG: '
     autocmd FileType c,cpp,cs               let b:comment_leader = '// '
     autocmd FileType java,javascript,scala  let b:comment_leader = '// '
     autocmd FileType css                    let b:comment_leader = '// '
@@ -1244,7 +1375,6 @@ augroup commentleader
     autocmd FileType python                 let b:comment_leader = '# '
     autocmd FileType sql,pgsql              let b:comment_leader = '-- '
 
-
     " "<C-R>" pastes the register while "=escape()" assigns the register a
     " value
     noremap <silent> <localleader>c
@@ -1252,9 +1382,7 @@ augroup commentleader
                 \ <CR>/<CR>:nohlsearch<CR>
     noremap <silent> <localleader>u
                 \ :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')
-                \ <CR>//e<CR>:nohlsearch<CR>
-
-
+                \ <CR>\?//e<CR>:nohlsearch<CR>
 
     autocmd FileType txt noremap <silent> <localleader>c
                 \ :<C-B>silent <C-E>s/^\(.*\)$/<!-- \1 -->/
@@ -1302,7 +1430,7 @@ autocmd FileType python nnoremap <buffer> <localleader>3 :w<cr>:let g:current_fi
 autocmd FileType sql,pgsql nnoremap <buffer> <localleader>r :w<cr>:let g:current_file_name=expand('%:p')<cr>:tabedit<cr>:term PAGER="less -S" psql lakeshore lakeshore_user -a -P null="<NULL>" -f <c-r>=escape(g:current_file_name,'\/') <CR><cr>
 "-P format=wrapped
 
-" autocmd FileType python call LoadPymode()
+autocmd FileType python call LoadPymode()
 
 "{{{ syntastic
 autocmd FileType python set makeprg=pylint\ --reports=n\ --msg-template=\"{path}:{line}:\ {msg_id}\ {symbol},\ {obj}\ {msg}\"\ %:p
