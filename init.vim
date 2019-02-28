@@ -271,6 +271,17 @@ let NERDTreeIgnore = ['\.pyc$']
 let NERDTreeMapOpenInTab='<ENTER>'
 "}}}
 
+
+
+"{{{ NERDCommenter
+
+nmap <silent> <localleader>c <plug>NERDCommenterAlignLeft
+nmap <silent> <localleader>u <plug>NERDCommenterUncomment
+
+vmap <silent> <localleader>c <plug>NERDCommenterAlignLeft
+vmap <silent> <localleader>u <plug>NERDCommenterUncomment
+"}}}
+
 "{{{ airline config
 " let g:airline_section_x = ''
 
@@ -332,10 +343,18 @@ nnoremap <leader>a :Ack! -i
 
 " {{{ pgsql
 let g:sql_type_default = 'pgsql'
+let g:pgsql_pl = ['python']
 " }}}
 
-" {{{ pgsql
+" {{{ SQLUtilities
 " vnoremap <leader>sf        <Plug>SQLU_Formatter<CR>
+let g:sqlutil_keyword_case = '\U'
+let g:sqlutil_align_comma = 1
+let g:sqlutil_align_keyword_right = 0
+" }}}
+"
+" {{{ vim-uppercase-sql
+let g:sqlutil_align_keyword_right = 0
 " }}}
 
 "{{{ Ultisnip
@@ -436,6 +455,10 @@ call plug#begin(g:vim_directory.'/bundle')
 
 " Personal plugins
 Plug g:vim_directory.'/bundle/personal'
+" colorscheme switcher
+Plug 'xolox/vim-colorscheme-switcher'
+" common vim functions
+Plug 'xolox/vim-misc'
 " Better directory navigation
 Plug 'scrooloose/nerdtree'
 " Focused vim
@@ -539,6 +562,8 @@ autocmd! User python-mode LoadPymode
 Plug 'heavenshell/vim-pydocstring'
 " Formatter
 Plug 'Chiel92/vim-autoformat'
+" commenting
+Plug 'scrooloose/nerdcommenter'
 
 " Specific python folding
 " Plug 'tmhedberg/SimpylFold'
@@ -552,7 +577,11 @@ Plug 'swekaj/php-foldexpr.vim', {'for' : 'php'}
 
 " Postgresql
 Plug 'lifepillar/pgsql.vim'
-Plug 'vim-scripts/SQLUtilities'
+" Plug 'vim-scripts/SQLUtilities'
+" Plug 'https://github.com/vim-scripts/Align'
+Plug 'alcesleo/vim-uppercase-sql'
+Plug 'mpyatishev/vim-sqlformat'
+
 
 " JavaScript
 Plug 'wookiehangover/jshint.vim'
@@ -590,6 +619,7 @@ set title                              " rename terminal
 "             \\ %{SyntasticStatuslineFlag()} " detailed command bar
 set history=200                        " a longer command history
 set wildmenu                           " visual autocomplete for command menu
+set fillchars=vert:$
 " set lines=30 columns=85
 " color {{{
 
@@ -607,15 +637,20 @@ if has("gui_running")
 "     let g:airline_theme='badwolf'
 else
 
-    colorscheme gruvbox
-    let g:airline_theme='gruvbox'
-    let g:gruvbox_contrast_light='hard'
+"     colorscheme gruvbox
+"     let g:airline_theme='gruvbox'
+"     let g:gruvbox_contrast_light='hard'
+"     let g:gruvbox_vert_split='bg1'
+" "     let g:gruvbox_improved_strings=1
+" "     hi StatusLineNC cterm=reverse ctermfg=241 ctermbg=250
+" "     hi VertSplit cterm=reverse ctermfg=241 ctermbg=250
+
 
 "     set background=light
 "     colorscheme PaperColor
 
-"     colorscheme badwolf
-"     let g:airline_theme='badwolf'
+    colorscheme badwolf
+    let g:airline_theme='badwolf'
 
 endif
 
@@ -650,6 +685,12 @@ vmap <Tab> >
 "}}}
 
 "{{{ Feel and Function
+
+command! W :write|!restart usadmin
+
+nnoremap ~ viw~
+xnoremap my y'>pV']:s/=.*//<cr>gvd
+
 " explicit mapping of <leader> \  and <localleader> ,
 let mapleader="\\"
 let maplocalleader=","
@@ -669,7 +710,7 @@ function! StripTrailingWhitespace()
     echom "Trailing whitespace found\n"
     normal mZ
     let l:chars = col("$")
-    %s/\s\+$//ec
+    %s/\s\+$//e
     if (line("'Z") != line(".")) || (l:chars != col("$"))
         echom "Trailing whitespace stripped\n"
     endif
@@ -1377,12 +1418,12 @@ augroup commentleader
 
     " "<C-R>" pastes the register while "=escape()" assigns the register a
     " value
-    noremap <silent> <localleader>c
-                \ :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')
-                \ <CR>/<CR>:nohlsearch<CR>
-    noremap <silent> <localleader>u
-                \ :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')
-                \ <CR>\?//e<CR>:nohlsearch<CR>
+"     noremap <silent> <localleader>c
+"                 \ :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')
+"                 \ <CR>/<CR>:nohlsearch<CR>
+"     noremap <silent> <localleader>u
+"                 \ :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')
+"                 \ <CR>\?//e<CR>:nohlsearch<CR>
 
     autocmd FileType txt noremap <silent> <localleader>c
                 \ :<C-B>silent <C-E>s/^\(.*\)$/<!-- \1 -->/
