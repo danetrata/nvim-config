@@ -70,6 +70,31 @@ endfunction
 
 "{{{ Deoplete
 let g:deoplete#enable_at_startup = 1
+" let g:deoplete#keyword_patterns = {}
+" let g:deoplete#keyword_patterns._ = '[a-zA-Z_]\k*\(?'
+
+let g:deoplete#omni#functions = get(g:, 'deoplete#omni#functions', {})
+let g:deoplete#omni#functions.css = 'csscomplete#CompleteCSS'
+let g:deoplete#omni#functions.html = 'htmlcomplete#CompleteTags'
+let g:deoplete#omni#functions.markdown = 'htmlcomplete#CompleteTags'
+" let g:deoplete#omni#functions.javascript =
+"	\ [ 'tern#Complete', 'jspc#omni', 'javascriptcomplete#CompleteJS' ]
+
+let g:deoplete#omni_patterns = get(g:, 'deoplete#omni_patterns', {})
+let g:deoplete#omni_patterns.html = '<[^>]*'
+" let g:deoplete#omni_patterns.javascript = '[^. *\t]\.\w*'
+" let g:deoplete#omni_patterns.javascript = '[^. \t]\.\%\(\h\w*\)\?'
+let g:deoplete#omni_patterns.php =
+	\ '\h\w*\|[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+
+let g:deoplete#omni#input_patterns = get(g:, 'deoplete#omni#input_patterns', {})
+let g:deoplete#omni#input_patterns.xml = '<[^>]*'
+let g:deoplete#omni#input_patterns.md = '<[^>]*'
+let g:deoplete#omni#input_patterns.css  = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
+let g:deoplete#omni#input_patterns.scss = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
+let g:deoplete#omni#input_patterns.sass = '^\s\+\w\+\|\w\+[):;]\?\s\+\w*\|[@!]'
+let g:deoplete#omni#input_patterns.python = ''
+let g:deoplete#omni#input_patterns.javascript = ''
 "}}}
 
 "{{{ Pymode
@@ -180,8 +205,14 @@ Plug 'Shougo/context_filetype.vim'
 Plug 'neovim/python-client'
 Plug 'klen/python-mode', {'for' : 'python'}
 
-" Php
-Plug 'swekaj/php-foldexpr.vim'
+" PHP
+Plug 'swekaj/php-foldexpr.vim', {'for' : 'php'}
+
+" CSS
+Plug 'hail2u/vim-css3-syntax', {'for' : 'css'}
+Plug 'othree/csscomplete.vim', {'for' : 'css'}
+Plug 'cakebaker/scss-syntax.vim', {'for' : 'css'}
+Plug 'ap/vim-css-color', {'for' : 'css'}
 
 call plug#end()
 
@@ -211,7 +242,7 @@ set title                              " rename terminal
 "             \\ %{SyntasticStatuslineFlag()} " detailed command bar
 set history=200                        " a longer command history
 set wildmenu                           " visual autocomplete for command menu
-set lines=30 columns=85
+" set lines=30 columns=85
 " color {{{
 if has("gui_running")
     colorscheme badwolf
@@ -253,8 +284,15 @@ set timeoutlen=5000                    " key map timing
 set undofile                           " persistent undo
 set undodir=~/.vim/undo                " persistent undo
 
+autocmd CursorHold,CursorHoldI,FocusGained,BufEnter * checktime
+autocmd FileChangedShellPost *
+  \ echohl WarningMsg | echo "File changed on disk. Buffer reloaded." | echohl None
+
 " copy into system clipboard = +
 nmap <leader>y "+y
+" don't overwrite register on paste
+" NB: this supports "rp that replaces the selection by the contents of @r
+vnoremap <silent> <expr> p <sid>Repl()
 " move between tabs
 nmap <f4> :tabn<cr>
 nmap <s-f4> :tabp<cr>
@@ -267,6 +305,19 @@ imap <C-del> <esc>lvedi
 " save session
 nnoremap <leader>s :mksession <CR>
 
+"{{{ don't overwrite register on paste
+" I haven't found how to hide this function (yet)
+function! RestoreRegister()
+  let @" = s:restore_reg
+  return ''
+endfunction
+
+function! s:Repl()
+    let s:restore_reg = @"
+    return "p@=RestoreRegister()\<cr>"
+endfunction
+
+"}}}
 "{{{ surround 
 " makes adding parenthesis easy
 nmap <leader>) csw)
@@ -535,6 +586,7 @@ augroup commentleader
     " FileTypePattern = [python, cpp, rst, ...]
     "
     " Commenting blocks of code.
+    let b:comment_leader = '# '
 
     autocmd FileType c,cpp,java,scala,cs let b:comment_leader = '// '
     autocmd FileType conf,fstab,apache   let b:comment_leader = '# '
